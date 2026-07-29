@@ -1,4 +1,5 @@
-'''
+## Project Structure
+``` 
 Sentinel_Satellite_AI_Detection_System/
 ├── README.md
 ├── LICENSE
@@ -80,5 +81,5 @@ Sentinel_Satellite_AI_Detection_System/
 └── deployment/
     ├── huggingface/                     # HF Spaces config, Week 5
     └── onnx/                            # stretch-goal quantization, Week 5
-'''
----
+
+

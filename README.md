@@ -1,6 +1,6 @@
-Sentinel_Satellite_AI_Detection_System/
-├── README.md
-├── LICENSE
+## Sentinel_Satellite_AI_Detection_System/
+## ├── README.md
+## ├── LICENSE
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt

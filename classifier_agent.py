@@ -13,7 +13,7 @@ _crewai_cache.mark_cache_breakpoint = lambda message: dict(message)
 
 load_dotenv()
 
-from classifier_tool import ClassifyTelemetryTool, FEATURE_ORDER
+from classifier_tool import ClassifyTelemetryTool, ClassificationResult, FEATURE_ORDER
 
 llm = LLM(model="groq/llama-3.3-70b-versatile")
 
@@ -39,8 +39,9 @@ task = Task(
     ),
     expected_output="The predicted class name and confidence score.",
     agent=classifier_agent,
+    output_pydantic=ClassificationResult,
 )
 
 crew = Crew(agents=[classifier_agent], tasks=[task], verbose=True)
 result = crew.kickoff()
-print(result)
+print(result.pydantic)

@@ -3,6 +3,11 @@ import xgboost as xgb
 from crewai.tools import BaseTool
 from pydantic import BaseModel, create_model
 
+
+class ClassificationResult(BaseModel):
+    predicted_class: str
+    confidence: float
+
 _model = xgb.XGBClassifier()
 _model.load_model("baseline_xgb.json")
 

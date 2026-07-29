@@ -1,0 +1,90 @@
+{
+  "MsgId": {
+    "mean": 6229.421038100497,
+    "std": 74.28413567702545
+  },
+  "CmdCode": {
+    "mean": 5.677250138045279,
+    "std": 6.4150753090698
+  },
+  "TimeRadians": {
+    "mean": 1.5082757934842628,
+    "std": 0.12187212955515557
+  },
+  "MsgLength": {
+    "mean": 44.63832136940917,
+    "std": 46.24432371772663
+  },
+  "ApId": {
+    "mean": 85.42103810049696,
+    "std": 74.28413567702543
+  },
+  "FlowLengthInWindow": {
+    "mean": 5.156571371741972,
+    "std": 8.52386422464159
+  },
+  "SlidingWindowMeanIntervalSec": {
+    "mean": 1.0225119565381893,
+    "std": 3.9332678250817454
+  },
+  "SlidingWindowMaxIntervalSec": {
+    "mean": 22.508735279986322,
+    "std": 11.008855029350247
+  },
+  "SlidingWindowMinIntervalSec": {
+    "mean": 15.061435620712532,
+    "std": 2.4776120558284838
+  },
+  "MessageCountInWindow": {
+    "mean": 22.422970734400884,
+    "std": 22.33800506460845
+  },
+  "UniqueMessageIDsInWindow": {
+    "mean": 5.332413031474323,
+    "std": 1.905077932903255
+  },
+  "AverageMessageLengthInWindow": {
+    "mean": 126.98163701431052,
+    "std": 137.12552151689135
+  },
+  "MessageRateInWindow": {
+    "mean": 0.6809550093768421,
+    "std": 0.8103568231345248
+  },
+  "StdDevMessageLengthInWindow": {
+    "mean": 89.59862940507551,
+    "std": 107.80143082209277
+  },
+  "MemoryAnonMB": {
+    "mean": 9.635134434570178,
+    "std": 9.188934076525557
+  },
+  "MemoryFileMB": {
+    "mean": 9.810129116578373,
+    "std": 11.093520493164528
+  },
+  "MemoryKernelstackMB": {
+    "mean": 2.0299828733081333,
+    "std": 2.001970740370245
+  },
+  "MemoryPageTableMB": {
+    "mean": 0.887591872375664,
+    "std": 0.8283859280775419
+  },
+  "MemorySocketMB": {
+    "mean": 0.07755997924479378,
+    "std": 0.06634537187598509
+  },
+  "MemoryPercpuMB": {
+    "mean": 0.009170361593797737,
+    "std": 0.036218765015380315
+  },
+  "MemoryShmemMB": {
+    "mean": 7.187065127611032,
+    "std": 9.780616240897844
+  },
+  "MemorySlabUnreclaimableMB": {
+    "mean": 1.2933831828567879,
+    "std": 1.3432563071000787
+  }
+}

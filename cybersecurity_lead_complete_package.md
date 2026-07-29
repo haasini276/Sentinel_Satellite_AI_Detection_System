@@ -28,6 +28,20 @@ All 5 CuCD-ID attack classes are verified against the live **DoD Space Attack Re
 
 ---
 
+### 1.1 Deeper Per-Class Technical Detail
+
+**Class 0 — Normal.** Nominal telemetry is not "no signal," it's a tight statistical band: message IDs, command codes, and inter-arrival timings cluster close to their orbit-baseline mean with low variance (empirically confirmed against `consolidated_dataset_raw.csv`'s Normal-labeled rows — see `nominal_baseline_stats.json`). The practical detection challenge is that *some* nominal features (e.g. sliding-window interval stats) can still drift under realistic sensor/channel noise without any actual threat present — which is exactly why a single-feature-deviation gate is unreliable and a multi-feature or recalibrated-baseline approach is needed (see the Monitor Agent's `should_escalate` logic).
+
+**Class 1 — Storage Exhaustion.** Maps to the general software weakness class **CWE-400 (Uncontrolled Resource Consumption)**. In cFS (core Flight System), shared memory segments (`MemoryShmemMB`) and anonymous RAM pools (`MemoryAnonMB`) are typically fixed-size, pre-allocated pools sized for worst-case nominal load — not elastic like a cloud VM. An attacker (or fault condition) that fills these pools starves *every other* FSW task sharing that pool, not just the targeted one, which is why this can cascade into unrelated subsystem failures rather than a contained fault. The real-world terrestrial analog is a memory-exhaustion DoS against an embedded RTOS device with no OOM-killer safety net.
+
+**Class 2 — Command Flooding.** Maps to **CWE-770 (Allocation of Resources Without Limits or Throttling)**. Many legacy CCSDS Telecommand (TC) Space Data Link Protocol implementations do not mandate per-command authentication or rate-limiting at the link layer — authentication, where present, is often handled at a higher application layer, leaving the receiver's ingest queue exposed to raw volume attacks. This is structurally the same class of problem as a terrestrial network SYN-flood: the defense isn't "reject bad commands" (they may be syntactically valid), it's "rate-limit total ingest regardless of validity."
+
+**Class 3 — Data Injection.** Maps to **CWE-290 (Authentication Bypass by Spoofing)**. Because CCSDS Telemetry (TM) packets are frequently transmitted without cryptographic integrity protection (no MAC/signature) in many legacy or resource-constrained missions, a spoofed packet that matches the expected format is indistinguishable from a genuine one at the protocol level — detection has to happen behaviorally (via the window-statistics features CuCD-ID uses), not cryptographically. This is precisely why it's this project's central risk: the same behavioral ambiguity that makes injected packets hard to spot is what also makes genuinely-Normal packets occasionally resemble injected ones (the confirmed 1,786-case Normal→Data-Injection confusion).
+
+**Class 4 — Defence Impairment.** Directly analogous to **MITRE ATT&CK Enterprise Technique T1562 (Impair Defenses)**, adapted to the space domain as SPARTA `DE-0001`. In FSW terms, this typically means disabling or corrupting the watchdog timer process, the onboard anomaly-detection task, or the health-and-status monitoring application — not the mission payload itself. It is flagged critical severity specifically because it is usually a *precursor* move: an attacker blinds the system's own detection capability first, so that a subsequent Storage Exhaustion, Command Flooding, or Data Injection attack goes unnoticed. This is why the finalized mitigation policy (§2) treats it with the lowest confidence bar for autonomous action (≥0.70, vs. ≥0.85 for the others) — waiting for high confidence on this specific class is itself a risk.
+
+---
+
 ## 2. Finalized Tool-Feasible Mitigation Policy Table
 
 Each security threat action is mapped to an **executable agent tool function** with feasibility specs and safety guardrails:
@@ -72,6 +86,46 @@ Each security threat action is mapped to an **executable agent tool function** w
 * **Attack Vector**: The intruders achieved full uplink access to the **Landsat-7** satellite (October 2007 for 12+ minutes) and the **Terra EOS** earth observation satellite (June and October 2008 for 2+ minutes), obtaining full command access without executing destructive payloads.
 * **SPARTA Mapping**: **ST0001 Reconnaissance**, **ST0003 Initial Access**, **ST0004 Execution**.
 * **Relevance to CuCD-ID**: Proves that satellite command uplink hijacking is an established operational threat vector, necessitating on-board autonomous intrusion detection that operates independently of ground control validation.
+
+---
+
+### 3.4 NASA JPL Network Breach via Unauthorized Raspberry Pi (2018)
+* **Incident Description**: Documented in NASA Office of Inspector General Report IG-19-022 (June 2019). An attacker gained access to the Jet Propulsion Laboratory network in April 2018 through a Raspberry Pi computer that had been connected to the network without authorization and without going through the standard security review process.
+* **Attack Vector**: Once inside via the unauthorized device, the attacker moved laterally across JPL's network gateway (shared with other NASA systems) for roughly 10 months undetected, exfiltrating approximately 500MB of data from a major mission system, including data related to the Mars Science Laboratory mission.
+* **SPARTA Mapping**: **ST0003 Initial Access** (unauthorized/unmonitored ground-segment device), **ST0008 Exfiltration** (extended undetected data exfiltration).
+* **Relevance to CuCD-ID**: A textbook illustration of why ground-segment asset hygiene matters even when the goal is on-board (space-segment) detection — an undetected foothold on the ground network is frequently the actual entry point, reinforcing the case for defense-in-depth rather than relying on any single detection layer.
+
+---
+
+### 3.5 Athena-Fidus Military Satellite Signal Interference (2018)
+* **Incident Description**: In September 2018, then French Defence Minister Florence Parly publicly stated that the Franco-Italian military communications satellite **Athena-Fidus** had its signal deliberately approached/intercepted in 2017 by a Russian vessel (the *Yantar*, an intelligence-gathering ship), in what she described as an attempted signal interception "in the hope of intercepting communications."
+* **Attack Vector**: Physical/RF-layer approach and signal interception rather than a network intrusion — attribution was made publicly by a government official rather than established via a released forensic report, so treat the attacker identity as a state's public accusation, not independently verified fact.
+* **SPARTA Mapping**: **ST0001 Reconnaissance** (signal/communications interception attempt).
+* **Relevance to CuCD-ID**: A reminder that not every space-segment threat is a digital command/telemetry intrusion — RF-layer eavesdropping and jamming are a distinct, real threat class alongside the CCSDS-message-level attacks CuCD-ID models, and should be scoped explicitly as "out of scope for this specific detector" in the project's threat model rather than silently ignored.
+
+---
+
+### 3.6 NATO Trident Juncture Exercise GPS Interference (2018)
+* **Incident Description**: During NATO's Trident Juncture military exercise in Norway/Finland (Oct–Nov 2018), Norwegian and Finnish officials reported GPS signal disruptions affecting both military and civilian aircraft and vessels in the region, which Norway's government publicly attributed to Russia.
+* **Attack Vector**: Suspected GPS jamming/interference at the receiver end — again a public government attribution, not a court-adjudicated finding, and worth citing with that caveat.
+* **SPARTA Mapping**: **ST0009 Impact** (denial of positioning/navigation service via signal-layer interference).
+* **Relevance to CuCD-ID**: Reinforces that satellite-adjacent denial-of-service isn't limited to the command-queue-saturation style of `Command Flooding` (Label 2) — it establishes that signal-layer DoS against space systems is an active, ongoing category of real-world incident, strengthening the "Impact" tactic narrative beyond just the CuCD-ID paper's own four attack classes.
+
+---
+
+### 3.7 Large-Scale GPS Spoofing Documented by C4ADS "Above Us Only Stars" (2019)
+* **Incident Description**: The nonprofit research group C4ADS published a 2019 report documenting thousands of GPS spoofing incidents affecting vessel and aircraft navigation systems, concentrated around the Black Sea, Russian ports, and Syria, using publicly available AIS (Automatic Identification System) data to identify anomalous, physically-impossible position jumps.
+* **Attack Vector**: Ground-based GPS signal spoofing equipment broadcasts fabricated satellite navigation signals that overpower genuine GPS signals at the receiver, causing the target's GNSS receiver to compute a false position — in some documented cases, ships appeared to "teleport" to a nearby airport.
+* **SPARTA Mapping**: **ST0009 Impact** (`SV-MA-2`-style false data injection, applied to satellite navigation signals rather than telemetry).
+* **Relevance to CuCD-ID**: The clearest large-scale, well-documented real-world precedent for the exact *category* of threat Data Injection (Label 3) represents — fabricated signals designed to be accepted as genuine by an automated receiver — just at the GPS/GNSS layer instead of CCSDS telemetry.
+
+---
+
+### 3.8 Satellite-Internet-Link Hijacking for Anonymous C2 ("Turla" APT, publicized 2015)
+* **Incident Description**: Security researchers (notably Kaspersky's GReAT team, 2015) documented the "Turla" advanced persistent threat group hijacking unencrypted consumer satellite internet (DVB-S) downlink traffic to route command-and-control communications for its malware.
+* **Attack Vector**: Because satellite internet downlink broadcasts are receivable by anyone within the satellite's footprint and are frequently unencrypted, the attackers listened for IP addresses of legitimate satellite-internet subscribers and then sent their own C2 traffic spoofed to appear to originate from the satellite link — making the true origin of the malicious traffic effectively untraceable, since investigators would only find the innocent subscriber's connection.
+* **SPARTA Mapping**: **ST0006 Defense Evasion** (anonymizing/obscuring the true origin of malicious command traffic).
+* **Relevance to CuCD-ID**: A different but related lesson from `Defence Impairment` (Label 4) — it shows attackers exploiting the *satellite communications medium itself* as an evasion tool, not just attacking a specific onboard defense mechanism, broadening the "why space-links need dedicated security thinking" narrative beyond just CubeSat FSW.
 
 ---
 

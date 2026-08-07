@@ -1,12 +1,14 @@
 import os
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
+from pathlib import Path
 from typing import Literal
 import chromadb
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-_client = chromadb.PersistentClient(path="./chroma_sparta")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_client = chromadb.PersistentClient(path=str(PROJECT_ROOT / "chroma_sparta"))
 _collection = _client.get_or_create_collection("sparta_knowledge")
 
 CLASS_NAMES = ["Normal", "Storage Exhaustion", "Command Flooding", "Data Injection", "Defence Impairment"]

@@ -1,9 +1,13 @@
 import json
+from pathlib import Path
 import pandas as pd
 import xgboost as xgb
 
-raw = pd.read_csv("consolidated_dataset_raw.csv")
-noised = pd.read_csv("noised_dataset.csv")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+ML_DIR = Path(__file__).resolve().parent
+
+raw = pd.read_csv(PROJECT_ROOT / "data" / "raw" / "consolidated_dataset_raw.csv")
+noised = pd.read_csv(PROJECT_ROOT / "data" / "noised" / "noised_dataset.csv")
 
 common_cols = [c for c in noised.columns if c in raw.columns and c != "Label"]
 Xtr, ytr = raw[common_cols], raw["Label"]
@@ -17,9 +21,9 @@ model = xgb.XGBClassifier(
 )
 model.fit(Xtr, ytr)
 
-model.save_model("baseline_xgb.json")
+model.save_model(str(ML_DIR / "baseline_xgb.json"))
 
-with open("baseline_feature_order.json", "w") as f:
+with open(ML_DIR / "baseline_feature_order.json", "w") as f:
     json.dump(common_cols, f, indent=2)
 
 print("Saved baseline_xgb.json")

@@ -1,4 +1,10 @@
-from mitigation_tool import decide_mitigation
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
+from tools.mitigation_tool import decide_mitigation
 
 tests = [
     ("Storage Exhaustion", 0.849), ("Storage Exhaustion", 0.85),

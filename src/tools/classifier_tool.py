@@ -1,7 +1,11 @@
 import json
+from pathlib import Path
 import xgboost as xgb
 from crewai.tools import BaseTool
 from pydantic import BaseModel, create_model
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+ML_DIR = PROJECT_ROOT / "src" / "ml"
 
 
 class ClassificationResult(BaseModel):
@@ -9,9 +13,9 @@ class ClassificationResult(BaseModel):
     confidence: float
 
 _model = xgb.XGBClassifier()
-_model.load_model("baseline_xgb.json")
+_model.load_model(str(ML_DIR / "baseline_xgb.json"))
 
-with open("baseline_feature_order.json") as f:
+with open(ML_DIR / "baseline_feature_order.json") as f:
     FEATURE_ORDER = json.load(f)
 
 CLASS_NAMES = ["Normal", "Storage Exhaustion", "Command Flooding", "Data Injection", "Defence Impairment"]

@@ -7,7 +7,10 @@ Run once (or whenever that source file changes): python build_sparta_kb.py
 import os
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
+from pathlib import Path
 import chromadb
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DOCUMENTS = [
     # --- Section 1: SPARTA class -> tactic/technique mapping (one doc per class) ---
@@ -227,7 +230,7 @@ DOCUMENTS = [
 
 
 def main():
-    client = chromadb.PersistentClient(path="./chroma_sparta")
+    client = chromadb.PersistentClient(path=str(PROJECT_ROOT / "chroma_sparta"))
     collection = client.get_or_create_collection("sparta_knowledge")
 
     collection.upsert(

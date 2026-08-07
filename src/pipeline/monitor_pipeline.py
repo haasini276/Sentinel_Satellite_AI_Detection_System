@@ -1,8 +1,12 @@
 import sys
 import json
 import time
+from pathlib import Path
 from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, LLM
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 # Same workarounds as classifier_agent.py — same CrewAI/Groq bugs apply here.
 sys.stdout.reconfigure(encoding="utf-8")
@@ -13,9 +17,9 @@ _crewai_cache.mark_cache_breakpoint = lambda message: dict(message)
 
 load_dotenv()
 
-from monitor_tool import should_escalate, FEATURE_ORDER
-from classifier_tool import ClassifyTelemetryTool, ClassificationResult
-from telemetry_simulator import TelemetryReplaySimulator
+from tools.monitor_tool import should_escalate, FEATURE_ORDER
+from tools.classifier_tool import ClassifyTelemetryTool, ClassificationResult
+from simulator.telemetry_simulator import TelemetryReplaySimulator
 
 llm = LLM(model="groq/llama-3.3-70b-versatile")
 
@@ -47,7 +51,7 @@ def classify_window(window: dict) -> ClassificationResult:
 
 MAX_ROWS_TO_PROCESS = 8  # smoke-test cap: bound Groq calls, don't burn the whole dataset
 
-sim = TelemetryReplaySimulator("noised_dataset.csv", buffer_size=50)
+sim = TelemetryReplaySimulator(str(PROJECT_ROOT / "data" / "noised" / "noised_dataset.csv"), buffer_size=50)
 sim.configure(speed_rows_per_sec=20, order_mode="shuffled", loop=False)
 sim.start()
 

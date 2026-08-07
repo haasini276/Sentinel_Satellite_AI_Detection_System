@@ -83,3 +83,56 @@ Sentinel_Satellite_AI_Detection_System/
     └── onnx/                            # stretch-goal quantization, Week 5
 
 
+## Setup & Running — Agent Pipeline (Agentic AI Lead components)
+
+### 1. Install dependencies
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+```
+Use Python 3.11 or 3.12. Newer versions (e.g. 3.14) may not have prebuilt wheels yet for some dependencies (xgboost, numpy) and will try to compile from source.
+
+### 2. Set your Groq API key
+Get a free key at [console.groq.com](https://console.groq.com), then create a `.env` file in the project root (copy `.env.example`):
+```
+GROQ_API_KEY=your-key-here
+```
+
+### 3. Build the SPARTA knowledge base (one-time, or after editing its source docs)
+```bash
+python src/rag/build_sparta_kb.py
+```
+
+### 4. Run an individual agent (standalone smoke test)
+```bash
+python src/agents/classifier_agent.py
+python src/agents/sparta_agent.py
+python src/agents/mitigation_agent.py
+python src/agents/incident_reporter_agent.py
+```
+Each prints its own test result and costs 1 Groq call.
+
+### 5. Run the full 5-agent pipeline against the live simulator
+```bash
+python src/pipeline/full_pipeline.py
+```
+Streams rows from `data/noised/noised_dataset.csv`, gates them through the Monitor Agent (free), and runs the full Classifier → SPARTA Analyst → Mitigation → Incident Reporter chain (4 Groq calls) on whatever escalates. Capped at a small row count by default — each escalated row costs real API quota.
+
+### 6. Run the dashboard
+```bash
+python src/dashboard/app.py
+```
+Open the printed local URL. Click **Start** to stream telemetry live, **🔍 Run Full Agent Analysis** to manually trigger the agent pipeline on the latest row (costs 4 Groq calls), or use the **Demo Mode** buttons for instant, zero-cost cached examples.
+
+### 7. Regenerate the cached demo examples (only if you edit the agents/tools)
+```bash
+python src/pipeline/generate_demo_cache.py
+```
+Costs ~4 Groq calls per class not already cached. Groq's free tier caps at 12,000 tokens/minute *and* 100,000 tokens/day — expect to hit the daily cap if you regenerate everything in one session; the script skips already-cached classes so it's safe to re-run after the quota resets.
+
+### 8. Run the fast tests (no Groq calls, no cost)
+```bash
+python tests/test_monitor.py
+python tests/test_mitigation_boundaries.py
+```

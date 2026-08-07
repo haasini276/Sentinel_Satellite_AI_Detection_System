@@ -2,3 +2,7 @@ crewai==1.15.5
 crewai-tools==1.15.5
 litellm==1.91.4
 python-dotenv
+pandas
+xgboost
+chromadb
+gradio>=5.0

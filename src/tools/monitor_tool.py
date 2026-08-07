@@ -1,11 +1,15 @@
 import json
+from pathlib import Path
 from crewai.tools import BaseTool
 from pydantic import BaseModel, create_model
 
-with open("nominal_baseline_stats.json") as f:
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+ML_DIR = PROJECT_ROOT / "src" / "ml"
+
+with open(ML_DIR / "nominal_baseline_stats.json") as f:
     STATS = json.load(f)
 
-with open("baseline_feature_order.json") as f:
+with open(ML_DIR / "baseline_feature_order.json") as f:
     FEATURE_ORDER = json.load(f)
 
 

@@ -1,6 +1,10 @@
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, LLM
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 # Same workarounds as classifier_agent.py / sparta_agent.py — same CrewAI/Groq bugs apply here.
 sys.stdout.reconfigure(encoding="utf-8")
@@ -11,7 +15,7 @@ _crewai_cache.mark_cache_breakpoint = lambda message: dict(message)
 
 load_dotenv()
 
-from mitigation_tool import MitigationPolicyTool
+from tools.mitigation_tool import MitigationPolicyTool
 
 llm = LLM(model="groq/llama-3.3-70b-versatile")
 

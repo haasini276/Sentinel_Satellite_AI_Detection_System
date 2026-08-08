@@ -93,12 +93,12 @@ python -m venv .venv
 .venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 Use Python 3.11 or 3.12. Newer versions (e.g. 3.14) may not have prebuilt wheels yet for some dependencies (xgboost, numpy) and will try to compile from source.
+```
 
 ### 2. Set your Groq API key
 Get a free key at [console.groq.com](https://console.groq.com), then create a `.env` file in the project root (copy `.env.example`):
-```
 GROQ_API_KEY=your-key-here
-```
+
 
 ### 3. Build the SPARTA knowledge base (one-time, or after editing its source docs)
 ```bash

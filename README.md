@@ -83,6 +83,8 @@ Sentinel_Satellite_AI_Detection_System/
     └── onnx/                            # stretch-goal quantization, Week 5
 
 
+
+```
 ## Setup & Running — Agent Pipeline (Agentic AI Lead components)
 
 ### 1. Install dependencies
@@ -90,7 +92,6 @@ Sentinel_Satellite_AI_Detection_System/
 python -m venv .venv
 .venv\Scripts\activate          # Windows
 pip install -r requirements.txt
-```
 Use Python 3.11 or 3.12. Newer versions (e.g. 3.14) may not have prebuilt wheels yet for some dependencies (xgboost, numpy) and will try to compile from source.
 
 ### 2. Set your Groq API key

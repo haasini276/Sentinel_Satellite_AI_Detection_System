@@ -19,6 +19,7 @@ Guardrails:
      handling and marks the incident FLAGGED_FOR_REVIEW instead of
      guessing.
 """
+from tools.mitigation_tool import POLICY
 import sys
 import time
 from pathlib import Path
@@ -131,7 +132,11 @@ def run_pipeline_for_window(window: dict) -> dict:
     status = "AUTONOMOUS"
     if classification is None:
         status = "ERROR"
-    elif classification.confidence < 0.70:
+       elif classification.confidence < (
+        min([thresh for thresh, action, _, _ in POLICY.get(classification.predicted_class, []) if action not in ("log_only", "Escalate Alert")], default=1.0)
+        if [thresh for thresh, action, _, _ in POLICY.get(classification.predicted_class, []) if action not in ("log_only", "Escalate Alert")]
+        else (0.0 if classification.predicted_class == "Normal" else 1.0)
+    ):
         status = "FLAGGED_FOR_REVIEW"
     elif "error" in sparta_raw.lower() or "error" in mitigation_raw.lower():
         status = "FLAGGED_FOR_REVIEW"

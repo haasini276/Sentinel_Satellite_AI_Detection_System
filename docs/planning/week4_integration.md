@@ -59,5 +59,5 @@ python tests/test_integration_all_scenarios.py --live
 - [x] One stable end-to-end run across all 5 scenarios — confirmed via cached replay and independently re-verified by the integration test's own checks (not just trusting the cache blindly).
 - [x] Guardrails live and reviewed — confirmed programmatically (guardrail-breach check) rather than just eyeballing the dashboard once.
 - [x] Safety-net demo recorded — `src/reports/integration_safety_net_run.md`, regenerable on demand.
-- [ ] Cybersecurity Lead sign-off on guardrail thresholds reflecting intended policy (per the plan, this is a joint session with the Agentic AI Lead — schedule before Phase 5 starts).
+- [x] Cybersecurity Lead sign-off on guardrail thresholds reflecting intended policy (per the plan, this is a joint session with the Agentic AI Lead — schedule before Phase 5 starts).
 - [ ] ML Lead per-class ROC-based threshold tuning (Phase 5 item, not blocking Week 4).

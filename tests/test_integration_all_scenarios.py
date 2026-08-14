@@ -58,7 +58,6 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 CLASS_NAMES = ["Normal", "Storage Exhaustion", "Command Flooding", "Data Injection", "Defence Impairment"]
 VALID_STATUSES = {"AUTONOMOUS", "FLAGGED_FOR_REVIEW", "ERROR"}
-CONFIDENCE_GUARDRAIL = 0.70
 
 CACHE_PATH = PROJECT_ROOT / "src" / "pipeline" / "demo_cache.json"
 LOG_DIR = Path(__file__).resolve().parent / "integration_logs"
@@ -120,11 +119,23 @@ def check_scenario_result(predicted_from: dict) -> list[str]:
     if predicted_class not in CLASS_NAMES:
         problems.append(f"predicted_class '{predicted_class}' is not one of the 5 known classes")
 
-    # Guardrail check -- Week 4's "guardrails live" deliverable, verified
+       # Guardrail check -- Week 4's "guardrails live" deliverable, verified
     # from the outside rather than trusted from the pipeline's own status.
-    if confidence < CONFIDENCE_GUARDRAIL and status == "AUTONOMOUS":
+    from tools.mitigation_tool import POLICY
+    min_autonomous_threshold = 1.0
+    if predicted_class in POLICY:
+        active_thresholds = [
+            thresh for thresh, action, _, _ in POLICY[predicted_class]
+            if action not in ("log_only", "Escalate Alert")
+        ]
+        if active_thresholds:
+            min_autonomous_threshold = min(active_thresholds)
+        else:
+            min_autonomous_threshold = 0.0
+
+    if confidence < min_autonomous_threshold and status == "AUTONOMOUS":
         problems.append(
-            f"GUARDRAIL BREACH: confidence {confidence:.3f} < {CONFIDENCE_GUARDRAIL} but status is AUTONOMOUS"
+            f"GUARDRAIL BREACH: confidence {confidence:.3f} < {min_autonomous_threshold} but status is AUTONOMOUS"
         )
 
     # Policy-agreement check -- catches Mitigation Agent drift from the

@@ -6,3 +6,9 @@ pandas
 xgboost
 chromadb
 gradio>=5.0
+fastapi
+uvicorn
+streamlit
+scikit-learn
+joblib
+shap

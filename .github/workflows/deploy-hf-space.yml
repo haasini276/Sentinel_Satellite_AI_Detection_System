@@ -48,8 +48,8 @@ jobs:
 
       - name: Push to the Hugging Face Space
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_SPACE_REPO: ${{ vars.HF_SPACE_REPO }}
+          HF_TOKEN: ${{ secrets.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 }}
+          HF_SPACE_REPO: ${{ vars.Amuthavel2402/SentinelSat_AI_detection_system }}
         run: |
           set -e
           if [ -z "${HF_SPACE_REPO}" ]; then

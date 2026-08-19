@@ -78,8 +78,17 @@ Sentinel_Satellite_AI_Detection_System/
 │   ├── test_monitor.py
 │   └── test_mitigation_boundaries.py
 │
+├── .github/
+│   └── workflows/
+│       └── deploy-hf-space.yml          # CI: push to main -> verify -> deploy to the HF Space
+│
 └── deployment/
-    ├── huggingface/                     # HF Spaces config, Week 5
+    ├── huggingface/                     # HF Spaces config, Week 5 (Software/Integration Lead)
+    │   ├── space_app.py                 # Space entrypoint: builds the SPARTA KB on cold start, then launches src/dashboard/app.py's `demo`
+    │   ├── requirements.txt             # trimmed Space-only deps (no streamlit/fastapi/uvicorn/shap)
+    │   ├── README.md                    # Space card (YAML frontmatter) to merge into the pushed README.md
+    │   ├── DEPLOY.md                    # step-by-step push guide, secrets, known free-tier constraints
+    │   └── verify_space_ready.py        # pre-push integration check — run before every deploy
     └── onnx/                            # stretch-goal quantization, Week 5
 
 
@@ -136,4 +145,13 @@ Costs ~4 Groq calls per class not already cached. Groq's free tier caps at 12,00
 ```bash
 python tests/test_monitor.py
 python tests/test_mitigation_boundaries.py
+```
+
+### 9. Deploy to Hugging Face Spaces (Week 5)
+See `deployment/huggingface/DEPLOY.md` for the full walkthrough. Short version:
+```bash
+python deployment/huggingface/verify_space_ready.py   # pre-push integration check
+# then follow DEPLOY.md steps 1-6 to create the Space, set the GROQ_API_KEY
+# secret, and push -- or let .github/workflows/deploy-hf-space.yml do it on
+# every push to main once HF_TOKEN / HF_SPACE_REPO are configured.
 ```

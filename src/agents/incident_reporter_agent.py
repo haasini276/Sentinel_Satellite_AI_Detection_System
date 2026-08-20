@@ -54,7 +54,6 @@ if __name__ == "__main__":
         expected_output="A short, narrative incident report in paragraph form that a human reviewer could act on in under a minute.",
         agent=incident_reporter_agent,
     )
-    )
     crew = Crew(agents=[incident_reporter_agent], tasks=[task], verbose=True)
     result = crew.kickoff()
     print(result)

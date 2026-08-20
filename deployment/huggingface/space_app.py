@@ -67,8 +67,34 @@ def ensure_sparta_kb() -> None:
         print(f"[space_app] SPARTA knowledge base already present ({collection.count()} documents) -- skipping build.")
 
 
+def _zerogpu_keepalive() -> bool:
+    """No-op, decorated with @spaces.GPU purely so Hugging Face's ZeroGPU
+    hardware check finds at least one GPU function at startup. This app
+    does no local GPU work (XGBoost inference + remote Groq API calls
+    only); without this, the platform kills the container immediately
+    with "No @spaces.GPU function detected during startup." Safe/cheap:
+    ZeroGPU only allocates a GPU for the brief duration this runs."""
+    return True
+
+
+try:
+    import spaces
+
+    _zerogpu_keepalive = spaces.GPU(_zerogpu_keepalive)
+except ImportError:
+    # Only present when Space hardware is ZeroGPU; harmless to skip
+    # elsewhere (e.g. local dev, a plain-CPU Space).
+    pass
+
+
 def main() -> None:
     ensure_sparta_kb()
+
+    try:
+        _zerogpu_keepalive()
+    except Exception as e:
+        # Never let the ZeroGPU warmup call itself break the app.
+        print(f"[space_app] ZeroGPU keepalive call failed (non-fatal): {e}")
 
     # Re-export the exact same Gradio app the local dashboard uses -- no
     # forked UI logic, so this Space stays identical in behavior to

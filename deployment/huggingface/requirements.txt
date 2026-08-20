@@ -22,3 +22,11 @@ xgboost
 scikit-learn
 chromadb
 gradio>=5.0
+
+# Required only because this Space is currently assigned ZeroGPU hardware
+# (Hugging Face free-tier dynamic-GPU pool). This app does no local GPU
+# work -- XGBoost inference + remote Groq API calls only -- but the
+# platform requires at least one @spaces.GPU-decorated function to exist
+# or it kills the container at startup with "No @spaces.GPU function
+# detected during startup." See the no-op function in space_app.py.
+spaces

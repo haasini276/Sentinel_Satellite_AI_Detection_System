@@ -132,7 +132,7 @@ def run_pipeline_for_window(window: dict) -> dict:
     status = "AUTONOMOUS"
     if classification is None:
         status = "ERROR"
-       elif classification.confidence < (
+    elif classification.confidence < (
         min([thresh for thresh, action, _, _ in POLICY.get(classification.predicted_class, []) if action not in ("log_only", "Escalate Alert")], default=1.0)
         if [thresh for thresh, action, _, _ in POLICY.get(classification.predicted_class, []) if action not in ("log_only", "Escalate Alert")]
         else (0.0 if classification.predicted_class == "Normal" else 1.0)

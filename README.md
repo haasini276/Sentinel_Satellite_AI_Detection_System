@@ -1,3 +1,13 @@
+---
+title: Sentinel Satellite
+emoji: 🛰️
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+app_file: deployment/huggingface/space_app.py
+pinned: false
+---
+
 ## Project Structure
 ``` 
 Sentinel_Satellite_AI_Detection_System/

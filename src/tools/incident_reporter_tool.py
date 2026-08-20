@@ -28,7 +28,7 @@ def compute_severity(class_name: str, action: str) -> str:
 def assess_false_positive_risk(class_name: str, confidence: float) -> dict:
     if class_name == "Normal":
         return {"fp_risk_score": "N/A", "risk_note": "No action taken; false positives not applicable to Normal classification."}
-       min_autonomous_threshold = 1.0
+    min_autonomous_threshold = 1.0
     if class_name in POLICY:
         active_thresholds = [
             thresh for thresh, action, _, _ in POLICY[class_name]

@@ -104,6 +104,12 @@ Sentinel_Satellite_AI_Detection_System/
 
 
 ```
+
+## Currently Deployed HuggingFace Link
+
+```
+https://huggingface.co/spaces/Amuthavel2402/Sentinel_Satellite
+```
 ## Setup & Running — Agent Pipeline (Agentic AI Lead components)
 
 ### 1. Install dependencies
